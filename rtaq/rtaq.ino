@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include "DAC_MPS.h"
 #include "Quantizer.h"
+#include "Scale.h"
 
 const int ANALOG = 0;
 Adafruit_ADS1115 ads1115;
