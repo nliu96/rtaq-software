@@ -30,6 +30,9 @@
     <ClInclude Include="Quantizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Scale.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Adafruit_ADS1015.cpp">

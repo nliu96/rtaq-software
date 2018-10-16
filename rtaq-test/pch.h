@@ -7,3 +7,4 @@
 
 #include "gtest/gtest.h"
 #include "Quantizer.h"
+#include "Scale.h"
