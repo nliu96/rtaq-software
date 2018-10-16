@@ -1,20 +1,20 @@
+#include "Scale.h"
+
 class Quantizer {
 public:
 	//Quantizer() : totalNotes(5) { };
 	~Quantizer() {
-		delete[] extendedScale;
+		//delete[] extendedScale;
 	};
 	Quantizer(unsigned int * scale, int size) {
 		this->centsScale = scale;
 		this->scaleSize = size;
 		setExtendedScale();
 	};
-	unsigned int * getCentsScale() {
-		return this->centsScale;
-	};
-	void setCentsScale(unsigned int * scale) {
-		this->centsScale = scale;
-		setExtendedScale();
+	Quantizer(Scale aScale) {
+		this->scale = aScale;
+		this->scaleSize = scale.getScaleSize();
+		setExtendedScaleClass();
 	};
 	unsigned int quantize(float voltageScaled) {
 		unsigned int output = 0;
@@ -28,17 +28,27 @@ public:
 
 		return output;
 	};
+	unsigned int * getCentsScale() {
+		return this->centsScale;
+	};
 	int getTotalNotes() {
 		return this->totalNotes;
+	};
+	Scale getScale() {
+		return this->scale;
+	}
+	float* getExtendedScale() {
+		return this->extendedScale;
 	}
 private:
 	const int highDacValue = 8192;
+	Scale scale;
 	unsigned int * centsScale;
-	unsigned int * extendedScale;
+	float * extendedScale;
 	unsigned int scaleSize;
 	unsigned int totalNotes;
 	void setExtendedScale() {
-		unsigned int highestCent = this->centsScale[scaleSize - 1];
+		/*unsigned int highestCent = 1200;// this->scale.getCentsScale()[scaleSize - 1];
 		unsigned int octaves = this->highDacValue / highestCent + 1;
 		this->totalNotes = ((octaves - 1) * (scaleSize - 1)) + scaleSize - 1;
 		this->extendedScale = new unsigned int[this->totalNotes];
@@ -53,6 +63,20 @@ private:
 		for (unsigned int p = 0; p < scaleSize; p++) {
 			idx = (octaves - 1) * (scaleSize - 1) + p;
 			extendedScale[idx] = centsScale[p] + (octaves - 1) * highestCent;
+		}*/
+	};
+	void setExtendedScaleClass() {
+		unsigned int highestCent = this->scale.getCentsScale()[scaleSize - 1];
+		unsigned int octaves = this->highDacValue / 1200;
+		this->totalNotes = octaves * scaleSize + 1;
+		this->extendedScale = new float[this->totalNotes];
+
+		extendedScale[0] = 0;
+		float* aCentsScale = scale.getCentsScale();
+		for (int i = 1; i < totalNotes; i++) {
+			int octaveScalar = i / scaleSize;
+			extendedScale[i] = octaveScalar *
+				aCentsScale[(i - 1) % scaleSize];
 		}
 	};
 };

@@ -1,34 +1,86 @@
+#ifndef SCALE_H_
+#define SCALE_H_
 class Scale {
 public:
 	~Scale() {
-		delete[] centsScale;
-		delete[] midiScale;
+		//delete[] centsScale;
+		//delete[] midiScale;
 	};
 	Scale() {
 		this->centsScale = new float[3]{ 5.0, 5.0, 5.0 };
 		this->midiScale = new unsigned int[3]{ 5, 5, 5 };
 	};
 	Scale(float * cents, int size) {
-		// Make sure there is no 0 or neg values
 		this->scaleSize = size;
-		if (cents[0] == 0) {
-			this->scaleSize = size - 1;
-			centsScale = new float[scaleSize];
-			for (int i = 0; i < size; i++) {
-				centsScale[i] = cents[i + 1];
-			}
-		} else {
-			centsScale = new float[scaleSize];
-			for (int i = 0; i < size; i++) {
-				centsScale[i] = cents[i];
-			}
+		this->centsScale = new float[scaleSize];
+		for (size_t i = 0; i < scaleSize; i++) {
+			centsScale[i] = cents[i];
 		}
+		this->sortScale();
+		this->removeBadNotes();
 	};
 	int getScaleSize() {
 		return this->scaleSize;
 	};
+	float* getCentsScale() {
+		return this->centsScale;
+	} 
 private:
 	float* centsScale;
 	unsigned int * midiScale;
 	int scaleSize;
+	void sortScale() {
+		// bubble sort it
+		for (int j = scaleSize - 1; j > 0; j--) {
+			bool swapped = false;
+			for (int i = 0; i < j; i++) {
+				if (centsScale[i] > centsScale[i + 1]) {
+					float temp = centsScale[i + 1];
+					centsScale[i + 1] = centsScale[i];
+					centsScale[i] = temp;
+					swapped = true;
+				}
+			}
+			if (!swapped) {
+				break;
+			}
+		}
+	};
+	void removeBadNotes() {
+		// Remove negatives, zeros, above 1200, duplicates
+		float prevVal = 0;
+		int *indices = new int[scaleSize];
+		int iInd = 0;
+		// Loop and note which to remove
+		for (int i = 0; i < scaleSize; i++) {
+			float curr = centsScale[i];
+			if (curr <= 0 || curr == prevVal || curr > 1200.0) {
+				indices[iInd] = i;
+				iInd++;
+			}
+
+			prevVal = curr;
+		}
+
+		// Create a new corrected array
+		if (iInd > 0) {
+			float* tempArray = new float[scaleSize - iInd];
+			int currIndiceIndex = 0;
+			int currTempIndex = 0;
+			for (int i = 0; i < scaleSize; i++) {
+				if (i == indices[currIndiceIndex]) {
+					currIndiceIndex++;	// Simply skip..
+				} else {
+					tempArray[currTempIndex] = this->centsScale[i];
+					currTempIndex++;
+				}
+			}
+
+			delete[] this->centsScale;
+			this->centsScale = tempArray;
+			this->scaleSize = scaleSize - iInd;
+		}
+		delete[] indices;
+	};
 };
+#endif

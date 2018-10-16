@@ -18,3 +18,19 @@ TEST(Quant, TestScales) {
 		EXPECT_EQ(out[i], q.quantize(toQuant[i]));
 	}
 }
+
+TEST(Quant, ScaleClass) {
+	float a[] = { 0, 1200 };
+	int aSize = sizeof(a) / sizeof(a[0]);
+	Scale scale = Scale(a, aSize);
+	Quantizer quantizer = Quantizer(scale);
+
+	ASSERT_EQ(scale.getScaleSize(), 1);
+	ASSERT_EQ(quantizer.getTotalNotes(), 7);
+
+	unsigned int expected[] = { 0, 1200, 2400, 3600, 4800, 6000, 7200 };
+	int expectedSize = sizeof(expected) / sizeof(expected[0]);
+	for (int i = 0; i < expectedSize; i++) {
+		EXPECT_EQ(quantizer.getExtendedScale()[i], expected[i]);
+	}
+}
