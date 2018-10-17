@@ -15,10 +15,10 @@ DAC_MPS dac4(1, PIN_CSB);
 const int ledPin = LED_BUILTIN;
 IntervalTimer timer;
 
-unsigned int a[] = {
-    0, 1200};
-Quantizer quantizer(a, 2);
-unsigned int scale[] = {};
+float a[] = {
+	0, 1200 };
+Scale scale(a, 2);
+Quantizer quantizer(scale);
 
 void setup()
 {
@@ -37,6 +37,7 @@ void readAndOutput() {
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
   i = (int)val;
   j = quantizer.quantize(i);
+  Serial.println(j);
   j = j / 2;
   dac1.setOutput(j);
   dac2.setOutput(j);
