@@ -1,24 +1,6 @@
 #include "pch.h"
 
-TEST(Quant, TestScales) {
-	unsigned int expected[] = { 0, 1200, 2400, 3600, 4800, 6000, 7200 };
-	unsigned int out[] = { 0, 1200, 2400, 3600, 4800, 6000, 7200, 7200 };
-	unsigned int toQuant[] = { 1, 1201, 2401, 3601, 4801, 6001, 7201, 8500 };
-	unsigned int a[] = { 0, 1200 };
-	int aSize = sizeof(a) / sizeof(a[0]);
-	int expectedSize = sizeof(expected) / sizeof(expected[0]);
-	int outSize = sizeof(out) / sizeof(out[0]);
-	Quantizer q = Quantizer(a, aSize);
-	// Error: 0 and 1200 end up with the same. We should pre-process + assume
-	// that they are going to be the same note (so this array should
-	// have a scale size of just 1.
-	ASSERT_EQ(q.getTotalNotes(), expectedSize);
-	
-	for (int i = 0; i < outSize; i++) {
-		EXPECT_EQ(out[i], q.quantize(toQuant[i]));
-	}
-}
-
+#pragma optimize("", off)
 TEST(Quant, ScaleClass) {
 	float a[] = { 0, 1200 };
 	int aSize = sizeof(a) / sizeof(a[0]);
@@ -34,3 +16,37 @@ TEST(Quant, ScaleClass) {
 		EXPECT_EQ(quantizer.getExtendedScale()[i], expected[i]);
 	}
 }
+TEST(Quant, Scale) {
+	float a[] = { 300.0, 1200.0 };
+	int aSize = sizeof(a) / sizeof(a[0]);
+	Scale scale = Scale(a, aSize);
+	Quantizer quantizer = Quantizer(scale);
+
+	ASSERT_EQ(scale.getScaleSize(), 2);
+	ASSERT_EQ(quantizer.getTotalNotes(), 13);
+
+	float expected[] = { 0, 300, 1200, 1500, 2400, 2700, 3600, 3900, 4800, 5100, 6000, 6300, 7200 };
+	int expectedSize = sizeof(expected) / sizeof(expected[0]);
+	for (int i = 0; i < expectedSize; i++) {
+		float test = quantizer.getExtendedScale()[i];
+		EXPECT_EQ(quantizer.getExtendedScale()[i], expected[i]);
+	}
+}
+
+TEST(Quant, Scale1) {
+	float a[] = { 300.0, 500.0 };
+	int aSize = sizeof(a) / sizeof(a[0]);
+	Scale scale = Scale(a, aSize);
+	Quantizer quantizer = Quantizer(scale);
+
+	float expected[] = { 0, 300, 500, 1200, 1500, 1700, 2400, 2700, 2900, 3600, 3900, 4100, 4800, 5100, 5300, 6000, 6300, 6500, 7200 };
+	int expectedSize = sizeof(expected) / sizeof(expected[0]);
+	ASSERT_EQ(scale.getScaleSize(), 3);
+	ASSERT_EQ(quantizer.getTotalNotes(), expectedSize);
+
+	for (int i = 0; i < expectedSize; i++) {
+		float test = quantizer.getExtendedScale()[i];
+		EXPECT_EQ(quantizer.getExtendedScale()[i], expected[i]);
+	}
+}
+#pragma optimize("", on)

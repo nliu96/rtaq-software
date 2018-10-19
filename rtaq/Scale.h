@@ -11,11 +11,14 @@ public:
 		this->midiScale = new unsigned int[3]{ 5, 5, 5 };
 	};
 	Scale(float * cents, int size) {
-		this->scaleSize = size;
+		// Simply append 1200 to ensure root
+		this->scaleSize = size + 1;
+		
 		this->centsScale = new float[scaleSize];
-		for (size_t i = 0; i < scaleSize; i++) {
+		for (size_t i = 0; i < scaleSize - 1; i++) {
 			centsScale[i] = cents[i];
 		}
+		centsScale[scaleSize - 1] = 1200.0;
 		this->sortScale();
 		this->removeBadNotes();
 	};
