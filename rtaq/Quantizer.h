@@ -1,5 +1,8 @@
 #include "Scale.h"
 
+#ifndef QUANTIZER_H_
+#define QUANTIZER_h_
+
 class Quantizer {
 public:
 	//Quantizer() : totalNotes(5) { };
@@ -53,3 +56,4 @@ private:
 		}
 	};
 };
+#endif

@@ -15,9 +15,9 @@ DAC_MPS dac4(1, PIN_CSB);
 const int ledPin = LED_BUILTIN;
 IntervalTimer timer;
 
-float a[] = {
-	0, 1200 };
-Scale scale(a, 2);
+
+float a[] = { 0.0, 300, 500, 700, 1000, 1200 };
+Scale scale(a, 6);
 Quantizer quantizer(scale);
 
 void setup()
@@ -26,18 +26,28 @@ void setup()
   ads1115.begin();
   ads1115.setGain(GAIN_TWOTHIRDS);
   Serial.begin(38400);
-  timer.begin(readAndOutput, 20000);
+  timer.begin(readAndOutput, 2000000);
 }
 
 float val;
 int i;
+int aInd = 0;
+float expected[] = { 0.0, 300, 500, 700, 1000, 1200,
+							1500, 1700, 1900, 2200, 2400,
+							2700, 2900, 3100, 3400, 3600,
+							3900, 4100, 4300, 4600, 4800,
+							5100, 5300, 5500, 5800, 6000,
+							6300, 6500, 6700, 7000, 7200 };
 
 void readAndOutput() {
   unsigned int j;
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
   i = (int)val;
-  j = quantizer.quantize(i);
-  Serial.println(j);
+  j = quantizer.quantize(expected[aInd % 31]);
+  Serial.print(j);
+  Serial.print(", expected:");
+  Serial.println(expected[aInd % 31]);
+  aInd++;
   j = j / 2;
   dac1.setOutput(j);
   dac2.setOutput(j);

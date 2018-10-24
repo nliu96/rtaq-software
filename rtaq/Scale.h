@@ -1,5 +1,6 @@
 #ifndef SCALE_H_
 #define SCALE_H_
+
 class Scale {
 public:
 	~Scale() {
@@ -22,6 +23,37 @@ public:
 		this->sortScale();
 		this->removeBadNotes();
 	};
+	Scale(char* scalaString, int charLength) {
+		// Note: strings are 0 terminated (last value is 0)
+		int currChar = 0;
+		int currValidLine = 0; // Keep track of relevant (non-comment) lines
+		
+		//TODO: kev, this is messed up..
+		// First line: just a title (ignore)
+		while (currChar < charLength) {
+			if (scalaString[currChar] != '!') {
+				currValidLine++; // This implies line is the title
+			} else if (scalaString[currChar] == '\n') {
+				currChar++;
+				break;
+			}
+			currChar++;
+		}
+
+		// Next line: should be # of notes
+		while (currChar < charLength) {
+			if (scalaString[currChar] != '!') {
+				currValidLine++;
+			}
+			else if (scalaString[currChar] == '\n') {
+				currChar++;
+				break;
+			}
+			currChar++;
+		}
+
+		this->scaleSize = 69;
+	}
 	int getScaleSize() {
 		return this->scaleSize;
 	};
