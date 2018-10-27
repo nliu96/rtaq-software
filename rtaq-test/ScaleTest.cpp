@@ -86,17 +86,15 @@ TEST(Scale, TestScales6) {
 }
 
 TEST(Scale, String) {
-	float a[] = { 0.0 };
-	float expected[] = { 1200 };
-	int aSize = sizeof(a) / sizeof(a[0]);
+	float expected[] = { 10.1, 20.1, 1200.0 };
 	int expSize = sizeof(expected) / sizeof(expected[0]);
-	char test[] = "testin";
+	char test[] = "dfg\n2\n10.1\n20.1";
 	int testLen = sizeof(test) / sizeof(test[0]);
-	//Scale scale = Scale("test", testLen);
+	Scale scale = Scale(test, testLen);
 
-	//ASSERT_EQ(scale.getScaleSize(), 69);
-	/*float* centsScale = scale.getCentsScale();
+	ASSERT_EQ(scale.getScaleSize(), expSize);
+	float* centsScale = scale.getCentsScale();
 	for (int i = 0; i < scale.getScaleSize(); i++) {
 		EXPECT_EQ(centsScale[i], expected[i]);
-	}*/
+	}
 }

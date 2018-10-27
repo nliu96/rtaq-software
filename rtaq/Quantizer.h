@@ -42,14 +42,14 @@ private:
 	unsigned int scaleSize;
 	unsigned int totalNotes;
 	void setExtendedScaleClass() {
-		unsigned int highestCent = this->scale.getCentsScale()[scaleSize - 1];
+		//unsigned int highestCent = this->scale.getCentsScale()[scaleSize - 1];
 		unsigned int octaves = this->highDacValue / 1200;
 		this->totalNotes = octaves * scaleSize + 1;
 		this->extendedScale = new float[this->totalNotes];
 
 		extendedScale[0] = 0;
 		float* aCentsScale = scale.getCentsScale();
-		for (int i = 1; i < totalNotes; i++) {
+		for (unsigned int i = 1; i < totalNotes; i++) {
 			int octaveScalar = (i - 1) / scaleSize;
 			extendedScale[i] = octaveScalar * 1200.0 +
 				aCentsScale[(i - 1) % scaleSize];
