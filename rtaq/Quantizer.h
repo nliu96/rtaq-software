@@ -1,11 +1,11 @@
 #include "Scale.h"
 
-#ifndef QUANTIZER_H_
+#ifndef QUANTIZER_h_
 #define QUANTIZER_h_
 
 class Quantizer {
 public:
-	//Quantizer() : totalNotes(5) { };
+	Quantizer() : totalNotes(5) { };
 	~Quantizer() {
 		//delete[] extendedScale;
 	};
@@ -34,6 +34,12 @@ public:
 	}
 	float* getExtendedScale() {
 		return this->extendedScale;
+	}
+	void operator=(const Quantizer& q) {
+		this->scale = q.scale;
+		this->extendedScale = q.extendedScale;
+		this->scaleSize = q.scaleSize;
+		this->totalNotes = q.totalNotes;
 	}
 private:
 	const int highDacValue = 8192;

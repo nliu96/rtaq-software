@@ -8,3 +8,5 @@
 #include "gtest/gtest.h"
 #include "Quantizer.h"
 #include "Scale.h"
+#include "Utils.h"
+#include "WeirdQuantizer.h"

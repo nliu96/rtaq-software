@@ -117,6 +117,8 @@
       <FileType>CppCode</FileType>
     </ClInclude>
     <ClInclude Include="Scale.h" />
+    <ClInclude Include="Utils.h" />
+    <ClInclude Include="WeirdQuantizer.h" />
     <ClInclude Include="__vm\.rtaq.vsarduino.h" />
   </ItemGroup>
   <ItemGroup>
