@@ -85,6 +85,20 @@ TEST(Scale, TestScales6) {
 	}
 }
 
+TEST(Scale, TestScales7) {
+	float a[] = { 300, 500, 700, 1000 };
+	float expected[] = { 300, 500, 700, 1000 };
+	int aSize = sizeof(a) / sizeof(a[0]);
+	int expSize = sizeof(expected) / sizeof(expected[0]);
+	Scale scale = Scale(a, aSize, false);
+
+	ASSERT_EQ(scale.getScaleSize(), expSize);
+	float* centsScale = scale.getCentsScale();
+	for (int i = 0; i < scale.getScaleSize(); i++) {
+		EXPECT_EQ(centsScale[i], expected[i]);
+	}
+}
+
 TEST(Scale, String) {
 	float expected[] = { 10.1, 20.1, 1200.0 };
 	int expSize = sizeof(expected) / sizeof(expected[0]);

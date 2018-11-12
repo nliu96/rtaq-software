@@ -8,22 +8,30 @@
 class WeirdQuantizer {
 public:
 	~WeirdQuantizer() {
-
+		
 	};
-	WeirdQuantizer(Scale aScale, int mainScaleNotes, int quantScaleNotes) {
+	WeirdQuantizer(Scale* aScale, int mainScaleNotes, int quantScaleNotes) {
 		this->scale = Utils::generateSubScale(aScale, mainScaleNotes);
 		this->quantizers = new Quantizer[numOutputs];
 		for (int i = 0; i < numOutputs; i++) {
-			quantizers[0] = Quantizer(
-				Utils::generateSubScale(this->scale, quantScaleNotes, i));
+			Scale* subScale = Utils::generateSubScale(this->scale, quantScaleNotes, i);
+			quantizers[i] = Quantizer(subScale);
 		}
 	};
 	int getNumOutputs() {
 		return this->numOutputs;
 	}
+	float* quantize(float* voltageScaled) {
+		float* outputs = new float[this->numOutputs];
+		for (int i = 0; i < numOutputs; i++) {
+			outputs[i] = quantizers[i].quantize(voltageScaled[i]);
+		}
+
+		return outputs;
+	}
 private:
 	Quantizer* quantizers;
-	Scale scale;
+	Scale* scale;
 	const int numOutputs = 4;
 };
 

@@ -3,20 +3,21 @@
 #ifndef QUANTIZER_h_
 #define QUANTIZER_h_
 
+#pragma optimize("", off)
 class Quantizer {
 public:
-	Quantizer() : totalNotes(5) { };
+	Quantizer() { };
 	~Quantizer() {
 		//delete[] extendedScale;
 	};
-	Quantizer(Scale aScale) {
+	Quantizer(Scale* aScale) {
 		this->scale = aScale;
-		this->scaleSize = scale.getScaleSize();
+		this->scaleSize = scale->getScaleSize();
 		setExtendedScaleClass();
 	};
-	unsigned int quantize(float voltageScaled) {
-		unsigned int output = 0;
-		unsigned int curr = 0;
+	float quantize(float voltageScaled) {
+		float output = 0;
+		float curr = 0;
 		for (unsigned int i = 0; i < this->totalNotes; i++) {
 			curr = this->extendedScale[i];
 			if (voltageScaled >= curr) {
@@ -29,7 +30,7 @@ public:
 	int getTotalNotes() {
 		return this->totalNotes;
 	};
-	Scale getScale() {
+	Scale* getScale() {
 		return this->scale;
 	}
 	float* getExtendedScale() {
@@ -43,7 +44,7 @@ public:
 	}
 private:
 	const int highDacValue = 8192;
-	Scale scale;
+	Scale* scale;
 	float * extendedScale;
 	unsigned int scaleSize;
 	unsigned int totalNotes;
@@ -54,7 +55,7 @@ private:
 		this->extendedScale = new float[this->totalNotes];
 
 		extendedScale[0] = 0;
-		float* aCentsScale = scale.getCentsScale();
+		float* aCentsScale = scale->getCentsScale();
 		for (unsigned int i = 1; i < totalNotes; i++) {
 			int octaveScalar = (i - 1) / scaleSize;
 			extendedScale[i] = octaveScalar * 1200.0 +

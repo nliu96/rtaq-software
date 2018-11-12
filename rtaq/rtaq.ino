@@ -3,6 +3,7 @@
 #include "DAC_MPS.h"
 #include "Quantizer.h"
 #include "Scale.h"
+#include "WeirdQuantizer.h"
 
 const int ANALOG = 0;
 Adafruit_ADS1115 ads1115;
@@ -18,7 +19,7 @@ IntervalTimer timer;
 
 float a[] = { 0.0, 300, 500, 700, 1000, 1200 };
 Scale scale(a, 6);
-Quantizer quantizer(scale);
+Quantizer quantizer(&scale);
 
 void setup()
 {
@@ -40,13 +41,30 @@ float expected[] = { 0.0, 300, 500, 700, 1000, 1200,
 							6300, 6500, 6700, 7000, 7200 };
 
 void readAndOutput() {
-  unsigned int j;
+
+  float aWeird[] = { 200, 400, 500, 700,
+			900, 1100, 1200 };
+  Scale scaleWeird(aWeird, 7);
+  WeirdQuantizer quantizahh = WeirdQuantizer(&scaleWeird, 6, 3);
+
+  float j;
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
-  i = (int)val;
+  i = val;
   j = quantizer.quantize(expected[aInd % 31]);
   Serial.print(j);
   Serial.print(", expected:");
   Serial.println(expected[aInd % 31]);
+
+  float inArr[] = { expected[aInd % 31], expected[aInd % 31], 
+	  expected[aInd % 31], expected[aInd % 31] };
+  float* arrOut = quantizahh.quantize(inArr);
+  for (int i = 0; i < 4; i++) {
+	  Serial.print(arrOut[i]);
+	  Serial.print(", ");
+  }
+  Serial.print("input: ");
+  Serial.println(expected[aInd % 31]);
+
   aInd++;
   j = j / 2;
   dac1.setOutput(j);
