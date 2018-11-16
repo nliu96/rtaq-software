@@ -218,6 +218,8 @@ private:
 		float multiplier = 10.0;
 		// Note what is to the right/left of the operator
 		for (int i = 0; i < length; i++) {
+			// Do nothing if it's whitespace
+			if (charBuffer[i] == ' ') { continue; }
 			if (charBuffer[i] == '.' || charBuffer[i] == '/') {
 				operatorIndex = i;
 				currTotal = &rightOperatorTotal;

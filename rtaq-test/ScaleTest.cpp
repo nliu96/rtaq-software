@@ -102,7 +102,7 @@ TEST(Scale, TestScales7) {
 TEST(Scale, String) {
 	float expected[] = { 10.1, 20.1, 1200.0 };
 	int expSize = sizeof(expected) / sizeof(expected[0]);
-	char test[] = "dfg\n2\n10.1\n20.1";
+	char test[] = "dfg\n2\n10.1\n   20.1";
 	int testLen = sizeof(test) / sizeof(test[0]);
 	Scale scale = Scale(test, testLen);
 
