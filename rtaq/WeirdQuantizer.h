@@ -10,11 +10,11 @@ public:
 	~WeirdQuantizer() {
 		
 	};
-	WeirdQuantizer(Scale* aScale, int mainScaleNotes, int quantScaleNotes) {
+	WeirdQuantizer(Scale* aScale, int mainScaleNotes, int quantScaleNotes, int shift) {
 		this->scale = Utils::generateSubScale(aScale, mainScaleNotes);
 		this->quantizers = new Quantizer[numOutputs];
 		for (int i = 0; i < numOutputs; i++) {
-			Scale* subScale = Utils::generateSubScale(this->scale, quantScaleNotes, i);
+			Scale* subScale = Utils::generateSubScale(this->scale, quantScaleNotes, i+shift);
 			quantizers[i] = Quantizer(subScale);
 		}
 	};

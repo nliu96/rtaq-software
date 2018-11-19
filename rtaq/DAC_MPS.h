@@ -12,7 +12,7 @@ class DAC_MPS
     ~DAC_MPS() { };
     void setOutput(unsigned int val)
 	{
-		DAC_MPS::setOutput(val, this->GAIN_1);
+		DAC_MPS::setOutput(val, this->GAIN_2);
 	};
     void setOutput(unsigned int val, byte gain) {
 		byte lowByte = val & 0xff;
