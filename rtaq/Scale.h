@@ -9,18 +9,26 @@ public:
 		//delete[] midiScale;
 	};
 	Scale() {
-		this->centsScale = new float[3]{ 5.0, 5.0, 5.0 };
-		this->midiScale = new unsigned int[3]{ 5, 5, 5 };
+
 	};
-	Scale(float * cents, int size) {
+	Scale(float * cents, int size, bool hasRoot=true) {
 		// Simply append 1200 to ensure root
-		this->scaleSize = size + 1;
-		
-		this->centsScale = new float[scaleSize];
-		for (int i = 0; i < scaleSize - 1; i++) {
-			centsScale[i] = cents[i];
+		if (hasRoot) {
+			this->scaleSize = size + 1;
+
+			this->centsScale = new float[scaleSize];
+			for (int i = 0; i < scaleSize - 1; i++) {
+				centsScale[i] = cents[i];
+			}
+			centsScale[scaleSize - 1] = 1200.0;
+		} else {
+			this->scaleSize = size;
+
+			this->centsScale = new float[scaleSize];
+			for (int i = 0; i < scaleSize; i++) {
+				centsScale[i] = cents[i];
+			}
 		}
-		centsScale[scaleSize - 1] = 1200.0;
 		this->sortScale();
 		this->removeBadNotes();
 	};
@@ -148,7 +156,6 @@ public:
 	} 
 private:
 	float* centsScale;
-	unsigned int * midiScale;
 	int scaleSize;
 	void sortScale() {
 		// bubble sort it
@@ -211,6 +218,8 @@ private:
 		float multiplier = 10.0;
 		// Note what is to the right/left of the operator
 		for (int i = 0; i < length; i++) {
+			// Do nothing if it's whitespace
+			if (charBuffer[i] == ' ') { continue; }
 			if (charBuffer[i] == '.' || charBuffer[i] == '/') {
 				operatorIndex = i;
 				currTotal = &rightOperatorTotal;
