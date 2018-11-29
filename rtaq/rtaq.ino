@@ -6,12 +6,13 @@
 #include "Scale.h"
 #include "WeirdQuantizer.h"
 #include <Encoder.h>
-//#include "WaveTable.h"
+#include "WaveTable.h"
 //#include <Wire.h>
 //#include <string>
 
 const int ANALOG = 0;
 Adafruit_ADS1115 ads1115;
+Waave wavetable = Waave();
 const int PIN_CSA = 9;
 const int PIN_CSB = 10;
 DAC_MPS dac1(0, PIN_CSA);
@@ -98,8 +99,31 @@ void readAndOutput() {
   JAZZ_ = analogRead(A17);
   CHROM_ = analogRead(A16);
 
-  
+  //wavetable parameter definition
+  int idxtf1 = (int)((((float)TF1_)/1023.0)*127);
+  int idxtf2 = (int)((((float)TF2_)/1023.0)*127);
 
+  int delta13 = (int)((((float)MU1_)/1023.0)*127);
+  int delta12 = (int)((((float)MU1_)/1023.0)*95);
+  int delta11 = (int)((((float)MU1_)/1023.0)*63);
+  int delta10 = (int)((((float)MU1_)/1023.0)*31);
+
+  int delta23 = (int)((((float)MU2_)/1023.0)*127);
+  int delta22 = (int)((((float)MU2_)/1023.0)*95);
+  int delta21 = (int)((((float)MU2_)/1023.0)*63);
+  int delta20 = (int)((((float)MU2_)/1023.0)*31);
+
+  int idx_ch0_tf1 = (idxtf1 + delta10) % 127;
+  int idx_ch1_tf1 = (idxtf1 + delta11) % 127; 
+  int idx_ch2_tf1 = (idxtf1 + delta12) % 127;
+  int idx_ch3_tf1 = (idxtf1 + delta13) % 127;
+
+  int idx_ch0_tf2 = (idxtf2 + delta20) % 127;
+  int idx_ch1_tf2 = (idxtf2 + delta21) % 127;
+  int idx_ch2_tf2 = (idxtf2 + delta22) % 127;
+  int idx_ch3_tf2 = (idxtf2 + delta23) % 127;
+  
+  //scale construction
   float aWeird[] = {200, 400, 600, 700, 900, 1100, 1200};
   int s = 7;
   
@@ -111,29 +135,67 @@ void readAndOutput() {
   scalenotes = (int)((((float)CHROM_)/1023.0)*s);
   qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
   shift = (int)(((float)SHIFT_)/1023.0);
+  
   Serial.println(pos/4);
-  WeirdQuantizer quantizahh = WeirdQuantizer(&scaleWeird, /*mainScaleNotes = */s, /*quantScaleNotes = */s, /*shift = */0);
+  WeirdQuantizer quantizahh = WeirdQuantizer(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);
 
-  //float j;
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
-  //Serial.println(val);
-  //i = val;
-  //j = quantizer.quantize(expected[aInd % 31]);
-  /*Serial.print(j);
-  Serial.print(", expected:");
-  Serial.println(expected[aInd % 31]);*/
+  int val_127 = (int)((val/0.2235)/256);
 
-  float inArr[] = {val, val, val, val};
+  //wavetable mapping and lookup
+  int idx10 = ((127*idx_ch0_tf1) + val_127) % 16384;
+  int idx11 = ((127*idx_ch1_tf1) + val_127) % 16384;
+  int idx12 = ((127*idx_ch2_tf1) + val_127) % 16384;
+  int idx13 = ((127*idx_ch3_tf1) + val_127) % 16384;
+
+  int idx20 = ((127*idx_ch0_tf2) + val_127) % 16384;
+  int idx21 = ((127*idx_ch1_tf2) + val_127) % 16384;
+  int idx22 = ((127*idx_ch2_tf2) + val_127) % 16384;
+  int idx23 = ((127*idx_ch3_tf2) + val_127) % 16384;
+
+  float val10 = 8192.0*wavetable.getTable()[idx10];
+  float val11 = 8192.0*wavetable.getTable()[idx11];
+  float val12 = 8192.0*wavetable.getTable()[idx12];
+  float val13 = 8192.0*wavetable.getTable()[idx13];
+
+  float val20 = 8192.0*wavetable.getTable()[idx20];
+  float val21 = 8192.0*wavetable.getTable()[idx21];
+  float val22 = 8192.0*wavetable.getTable()[idx22];
+  float val23 = 8192.0*wavetable.getTable()[idx23];
+
+  //wavetable mix
+  float k = ((float)MIX_)/1023.0;
+
+  float val0;
+  float val1;
+  float val2;
+  float val3;
+  
+  int op = 0;
+  if (op == 0){
+    val0 = 0.5*(k*val10 + (1-k)*val20);
+    val1 = 0.5*(k*val11 + (1-k)*val21);
+    val2 = 0.5*(k*val12 + (1-k)*val22);
+    val3 = 0.5*(k*val13 + (1-k)*val23);
+  }
+
+  Serial.print(idx10);
+  Serial.print(", ");
+  Serial.print(idx11);
+  Serial.print(", ");
+  Serial.print(idx12);
+  Serial.print(", ");
+  Serial.print(idx13);
+  Serial.println(' ');
+  
+  float inArr[] = {val0, val1, val2, val3};
   float* arrOut = quantizahh.quantize(inArr);
+  
   for (int i = 0; i < 4; i++) {
 	  //Serial.print(arrOut[i]);
 	  //Serial.print(", ");
   }
-  //Serial.print("input: ");
-  //Serial.println(expected[aInd % 31]);
 
-  //aInd++;
-  //j = j / 2;
   dac1.setOutput(arrOut[0]/2);
   dac2.setOutput(arrOut[1]/2);
   dac3.setOutput(arrOut[2]/2);
