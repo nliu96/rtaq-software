@@ -71,6 +71,7 @@ int MIX_;
 int DENSITY_;
 int JAZZ_;
 int CHROM_;
+int ORDER_;
 long pos = -999;
 
 /*float expected[] = { 0.0, 300, 500, 700, 1000, 1200,
@@ -98,6 +99,7 @@ void readAndOutput() {
   DENSITY_ = 1023 - analogRead(A18);
   JAZZ_ = analogRead(A17);
   CHROM_ = analogRead(A16);
+  ORDER_ = analogRead(A15); 
 
   //wavetable parameter definition
   int idxtf1 = (int)((((float)TF1_)/1023.0)*127);
@@ -142,6 +144,15 @@ void readAndOutput() {
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
   int val_127 = (int)((val/0.2235)/256);
 
+  /*idx_ch0_tf1 = 0;
+  idx_ch1_tf1 = 0;
+  idx_ch2_tf1 = 0;
+  idx_ch3_tf1 = 0;
+  idx_ch0_tf2 = 0;
+  idx_ch1_tf2 = 0;
+  idx_ch2_tf2 = 0;
+  idx_ch3_tf2 = 0;*/
+  
   //wavetable mapping and lookup
   int idx10 = ((127*idx_ch0_tf1) + val_127) % 16384;
   int idx11 = ((127*idx_ch1_tf1) + val_127) % 16384;
@@ -163,6 +174,7 @@ void readAndOutput() {
   float val22 = 8192.0*wavetable.getTable()[idx22];
   float val23 = 8192.0*wavetable.getTable()[idx23];
 
+
   //wavetable mix
   float k = ((float)MIX_)/1023.0;
 
@@ -170,8 +182,9 @@ void readAndOutput() {
   float val1;
   float val2;
   float val3;
-  
-  int op = 0;
+
+  int op = (int)((((float)DP_)/1023.0)*3);
+  op = 0;
   if (op == 0){
     val0 = 0.5*(k*val10 + (1-k)*val20);
     val1 = 0.5*(k*val11 + (1-k)*val21);
@@ -179,14 +192,61 @@ void readAndOutput() {
     val3 = 0.5*(k*val13 + (1-k)*val23);
   }
 
-  Serial.print(idx10);
-  Serial.print(", ");
-  Serial.print(idx11);
-  Serial.print(", ");
-  Serial.print(idx12);
-  Serial.print(", ");
-  Serial.print(idx13);
-  Serial.println(' ');
+
+  //chebyshev polynomials
+  
+  int order = (int)((((float)ORDER_)/1023.0)*6);
+  order = 1;
+  
+  float nval0 = val0/8096.0;
+  float nval1 = val1/8096.0;
+  float nval2 = val2/8096.0;
+  float nval3 = val3/8096.0;
+  
+  if (order == 0) {
+    val0 = 0;
+    val1 = 1200;
+    val2 = 2400;
+    val3 = 3600;
+  }
+  else if (order == 1) {
+    val0 = val0;
+    val1 = val1;
+    val2 = val2;
+    val3 = val3;
+  }
+  else if (order == 2) {
+    val0 = 8096.0*fabs(2*nval0*nval0 - 1);
+    val1 = 8096.0*fabs(2*nval1*nval1 - 1);
+    val2 = 8096.0*fabs(2*nval2*nval2 - 1);
+    val3 = 8096.0*fabs(2*nval3*nval3 - 1);
+  }
+  else if (order == 3) {
+    val0 = 8096.0*fabs(4*nval0*nval0*nval0 - 3*nval0);
+    val1 = 8096.0*fabs(4*nval1*nval1*nval1 - 3*nval1);
+    val2 = 8096.0*fabs(4*nval2*nval2*nval2 - 3*nval2);
+    val3 = 8096.0*fabs(4*nval3*nval3*nval3 - 3*nval3);
+  }
+  else if (order == 4) {
+    val0 = 8096.0*fabs(8*nval0*nval0*nval0*nval0 - 8*nval0*nval0 + 1);
+    val1 = 8096.0*fabs(8*nval1*nval1*nval1*nval1 - 8*nval1*nval1 + 1);
+    val2 = 8096.0*fabs(8*nval2*nval2*nval2*nval2 - 8*nval2*nval2 + 1);
+    val3 = 8096.0*fabs(8*nval3*nval3*nval3*nval3 - 8*nval3*nval3 + 1);
+  }
+  else if (order == 5) {
+    val0 = 8096.0*fabs(16*nval0*nval0*nval0*nval0*nval0 - 20*nval0*nval0*nval0 + 5*nval0);
+    val1 = 8096.0*fabs(16*nval1*nval1*nval1*nval1*nval1 - 20*nval1*nval1*nval1 + 5*nval1);
+    val2 = 8096.0*fabs(16*nval2*nval2*nval2*nval2*nval2 - 20*nval2*nval2*nval2 + 5*nval2);
+    val3 = 8096.0*fabs(16*nval3*nval3*nval3*nval3*nval3 - 20*nval3*nval3*nval3 + 5*nval3);
+  }
+  else if (order == 6) {
+    val0 = 8096.0*fabs(32*nval0*nval0*nval0*nval0*nval0*nval0 - 48*nval0*nval0*nval0*nval0 + 18*nval0*nval0 - 1);
+    val1 = 8096.0*fabs(32*nval1*nval1*nval1*nval1*nval1*nval1 - 48*nval1*nval1*nval1*nval1 + 18*nval1*nval1 - 1);
+    val2 = 8096.0*fabs(32*nval2*nval2*nval2*nval2*nval2*nval2 - 48*nval2*nval2*nval2*nval2 + 18*nval2*nval2 - 1);
+    val3 = 8096.0*fabs(32*nval3*nval3*nval3*nval3*nval3*nval3 - 48*nval3*nval3*nval3*nval3 + 18*nval3*nval3 - 1);
+  }
+
+
   
   float inArr[] = {val0, val1, val2, val3};
   float* arrOut = quantizahh.quantize(inArr);
@@ -200,7 +260,9 @@ void readAndOutput() {
   dac2.setOutput(arrOut[1]/2);
   dac3.setOutput(arrOut[2]/2);
   dac4.setOutput(arrOut[3]/2);
+  
   delete[] arrOut;
+  delete[] inArr;
 }
 
 int ledState = LOW;
