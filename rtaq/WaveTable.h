@@ -1,15 +1,13 @@
 #ifndef WAVETABLE_H_
 #define WAVETABLE_H_
 
-#include <SdFat.h>
+//#include <SdFat.h>
 #include <string>
 
 // 127 X 127 array
 #define ROW_DIM 127
 #define COL_DIM 127
 
-extern SdFat SD;
-extern File file;
 
 /*
  * Read a file one field at a time.
@@ -32,12 +30,6 @@ extern File file;
  */
 
 
-extern float wtable[ROW_DIM][COL_DIM];
-
-size_t readField(File* file, char* str, size_t size, const char* delim);
-//------------------------------------------------------------------------------
-#define errorHalt() {SysCall::halt();}
-//------------------------------------------------------------------------------
 void loadTable();
 float getWaveTableValue(int table, int index);
 

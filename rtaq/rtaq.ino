@@ -51,6 +51,8 @@ void setup()
       Serial.println(" ");
   }*/
   timer.begin(readAndOutput, 200000);
+  //attachInterrupt(digitalPinToInterrupt(clockpin), readAndOutput, RISING);
+  attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
 
 float val;
@@ -73,6 +75,7 @@ int JAZZ_;
 int CHROM_;
 int ORDER_;
 long pos = -999;
+long sss = 5;
 
 /*float expected[] = { 0.0, 300, 500, 700, 1000, 1200,
 							1500, 1700, 1900, 2200, 2400,
@@ -80,6 +83,9 @@ long pos = -999;
 							3900, 4100, 4300, 4600, 4800,
 							5100, 5300, 5500, 5800, 6000,
 							6300, 6500, 6700, 7000, 7200 };*/
+void scaleSelect() {
+  sss = pos/4;
+}
 
 void readAndOutput() {
   
@@ -124,12 +130,56 @@ void readAndOutput() {
   int idx_ch1_tf2 = (idxtf2 + delta21) % 127;
   int idx_ch2_tf2 = (idxtf2 + delta22) % 127;
   int idx_ch3_tf2 = (idxtf2 + delta23) % 127;
+
+  int s = 0;
+  float aFake[] = {1200};
+  Scale scaleWeird(aFake, 1);
   
-  //scale construction
-  float aWeird[] = {200, 400, 600, 700, 900, 1100, 1200};
-  int s = 7;
+  //scale lookup
+  int n = 6;
+  switch (sss % n){
+    case 0:{
+      float aWeird[] = {1200};
+      int s = 1;
+      Scale scaleWeird(aWeird, s);}
+      break;
+      
+    case 1:{
+      float aWeird[] = {300, 500, 700, 1000, 1200};
+      int s = 5;
+      Scale scaleWeird(aWeird, s);}
+      break;
+      
+    case 2:{
+      float aWeird[] = {200, 400, 700, 900, 1200};
+      int s = 5;
+      Scale scaleWeird(aWeird, s);}
+      break;
+      
+    case 3:{
+      float aWeird[] = {200, 300, 500, 700, 800, 1000, 1200};
+      int s = 7;
+      Scale scaleWeird(aWeird, s);}
+      break;
+      
+    case 4:{
+      float aWeird[] = {200, 400, 500, 700, 900, 1100, 1200};
+      int s = 7;
+      Scale scaleWeird(aWeird, s);}
+      break;
+      
+    case 5:{
+      float aWeird[] = {200, 400, 600, 700, 900, 1100, 1200};
+      int s = 7;
+      Scale scaleWeird(aWeird, s);}
+      break;
+
+    default:{
+      Scale scaleWeird();}
+      break;
+  }
   
-  Scale scaleWeird(aWeird, s);
+  
   
   int scalenotes;
   int qnotes;
@@ -138,7 +188,7 @@ void readAndOutput() {
   qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
   shift = (int)(((float)SHIFT_)/1023.0);
   
-  Serial.println(pos/4);
+  //Serial.println(pos/4);
   WeirdQuantizer quantizahh = WeirdQuantizer(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);
 
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
