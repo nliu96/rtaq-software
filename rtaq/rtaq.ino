@@ -186,10 +186,32 @@ void readAndOutput() {
   int op = (int)((((float)DP_)/1023.0)*3);
   op = 0;
   if (op == 0){
-    val0 = 0.5*(k*val10 + (1-k)*val20);
-    val1 = 0.5*(k*val11 + (1-k)*val21);
-    val2 = 0.5*(k*val12 + (1-k)*val22);
-    val3 = 0.5*(k*val13 + (1-k)*val23);
+    //arithmetic avg
+    val0 = (k*val20 + (1-k)*val10);
+    val1 = (k*val21 + (1-k)*val11);
+    val2 = (k*val22 + (1-k)*val12);
+    val3 = (k*val23 + (1-k)*val13);
+  }
+  else if (op == 1){
+    //geometric avg
+    val0 = 2*sqrt(k*val20 + (1-k)*val10);
+    val1 = 2*sqrt(k*val21 + (1-k)*val11);
+    val2 = 2*sqrt(k*val22 + (1-k)*val12);
+    val3 = 2*sqrt(k*val23 + (1-k)*val13);
+  }
+    else if (op == 2){
+    //min
+    val0 = k*2*min(val10,val20);
+    val1 = k*2*min(val11,val21);
+    val2 = k*2*min(val12,val22);
+    val3 = k*2*min(val13,val23);
+  }
+    else if (op == 3){
+    //max
+    val0 = k*2*max(val10,val20);
+    val1 = k*2*max(val11,val21);
+    val2 = k*2*max(val12,val22);
+    val3 = k*2*max(val13,val23);
   }
 
 
