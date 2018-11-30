@@ -8,7 +8,7 @@ class Quantizer {
 public:
 	Quantizer() { };
 	~Quantizer() {
-		//delete[] extendedScale;
+		delete[] extendedScale;
 	};
 	Quantizer(Scale* aScale) {
 		this->scale = aScale;

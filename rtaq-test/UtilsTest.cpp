@@ -29,6 +29,7 @@ TEST(WeirdQuant, Basic) {
 	int aSize = sizeof(a) / sizeof(a[0]);
 	Scale sc = Scale(a, aSize);
 	WeirdQuantizer q = WeirdQuantizer(&sc, 7, 5);
+	q.set(&sc, 7, 5);
 	EXPECT_EQ(1, 1); // We just want it to run
 }
 

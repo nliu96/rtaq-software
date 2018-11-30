@@ -26,8 +26,9 @@ public:
 			tempCentsScale[i] = originalCentsScale[
 					shiftIndex(scaledIndex, shift, originalScaleSize)];
 		}
-
-		return new Scale(tempCentsScale, numNotes, false);
+		Scale* outScale = new Scale(tempCentsScale, numNotes, false);
+		delete[] tempCentsScale;
+		return outScale;
 	};
 private:
 	static int shiftIndex(int index, int shift, int arraySize) {

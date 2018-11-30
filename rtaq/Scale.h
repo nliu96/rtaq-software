@@ -5,8 +5,7 @@
 class Scale {
 public:
 	~Scale() {
-		//delete[] centsScale;
-		//delete[] midiScale;
+		delete[] centsScale;
 	};
 	Scale() {
 
