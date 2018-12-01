@@ -16,6 +16,15 @@ public:
 		//quantizers[0].~Quantizer();
 		//delete[] quantizers[1].getScale();
 	};
+  WeirdQuantizer() {
+    float fake[] = {1200};
+    Scale aFake(fake, 1);
+    this->scale = Utils::generateSubScale(&aFake, 1);
+    this->quantizers = new Quantizer[numOutputs];
+    for (int i = 0; i < numOutputs; i++) {
+      quantizers[i] = Quantizer(&aFake);
+    }
+  };
 	WeirdQuantizer(Scale* aScale, int mainScaleNotes, int quantScaleNotes, int shift=0) {
 		this->scale = Utils::generateSubScale(aScale, mainScaleNotes);
 		this->quantizers = new Quantizer[numOutputs];
@@ -37,14 +46,15 @@ public:
 		return outputs;
 	}
 	void set(Scale* aScale, int mainScaleNotes, int quantScaleNotes, int shift = 0) {
-		delete this->scale;
+		//delete this->scale;
 		this->scale = Utils::generateSubScale(aScale, mainScaleNotes);
 		//this->quantizers = new Quantizer[numOutputs];
 		for (int i = 0; i < numOutputs; i++) {
 			//quantizers[i].~Quantizer();
 			Scale* subScale = Utils::generateSubScale(this->scale, quantScaleNotes, i + shift);
 			quantizers[i] = Quantizer(subScale);
-			delete subScale;
+      //Serial.println("didn't crash here I guess xxx");
+			//delete subScale;
 		}
 	}
 private:

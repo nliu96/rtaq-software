@@ -13,6 +13,7 @@
 const int ANALOG = 0;
 Adafruit_ADS1115 ads1115;
 Waave wavetable = Waave();
+
 const int PIN_CSA = 9;
 const int PIN_CSB = 10;
 DAC_MPS dac1(0, PIN_CSA);
@@ -28,36 +29,30 @@ Encoder knob(32, 31);
 /*float a[] = { 0.0, 300, 500, 700, 1000, 1200 };
 Scale scale(a, 6);
 Quantizer quantizer(&scale);*/
-
+void readAndOutput();
+void scaleSelect();
 void setup()
 {
-  //Wire.setSDA(1);
-  //Wire.setSCL(0);
-  //Wire.begin();
+  Serial.begin(38400);
+  while( !Serial );
+  Serial.flush();
+  Serial.println("initialized");
   SPI.setSCK(27);
   SPI.begin();
   ads1115.begin();
   ads1115.setGain(GAIN_TWOTHIRDS);
-  Serial.begin(38400);
-  //Serial.println("initialized");
-  //loadTable();
-  //Serial.println("wavetable loaded");
-  /*for (int i = 0; i < 127; i++) {
-      for (int j = 0; j < 127; j++) {
-        float tbval = getWaveTableValue(i, j);
-        Serial.print(tbval);
-        Serial.print(", "); 
-      }
-      Serial.println(" ");
-  }*/
-  timer.begin(readAndOutput, 200000);
-  //attachInterrupt(digitalPinToInterrupt(clockpin), readAndOutput, RISING);
+
+  pinMode(30, INPUT_PULLUP);
+  pinMode(29, INPUT_PULLUP);
+
+  //timer.begin(readAndOutput, 200000);
+  attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
 
+WeirdQuantizer quantizahh = WeirdQuantizer();
+
 float val;
-//int i;
-//int aInd = 0;
 int ADC_;
 int AMP_;
 int DEST_;
@@ -83,12 +78,9 @@ long sss = 5;
 							3900, 4100, 4300, 4600, 4800,
 							5100, 5300, 5500, 5800, 6000,
 							6300, 6500, 6700, 7000, 7200 };*/
-void scaleSelect() {
-  sss = pos/4;
-}
 
 void readAndOutput() {
-  
+  //Serial.println("in ISR");
   
   ADC_ = 1023 - analogRead(A9);
   AMP_ = analogRead(A8);
@@ -131,77 +123,108 @@ void readAndOutput() {
   int idx_ch2_tf2 = (idxtf2 + delta22) % 127;
   int idx_ch3_tf2 = (idxtf2 + delta23) % 127;
 
-  int s = 0;
-  float aFake[] = {1200};
-  Scale scaleWeird(aFake, 1);
-  
+  //float fake[] = {1200};
+  //Scale scaleWeird(fake, 1);
+  //quantizahh.set(&scaleWeird, 1, 1, 0);
   //scale lookup
   int n = 6;
   switch (sss % n){
     case 0:{
       float aWeird[] = {1200};
       int s = 1;
-      Scale scaleWeird(aWeird, s);}
+      Scale scaleWeird(aWeird, s);      
+      int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
+      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
+      int shift = (int)(((float)SHIFT_)/1023.0);
+      scalenotes = s;
+      qnotes = s;
+      shift = 0;
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
     case 1:{
       float aWeird[] = {300, 500, 700, 1000, 1200};
       int s = 5;
-      Scale scaleWeird(aWeird, s);}
+      Scale scaleWeird(aWeird, s);      
+      int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
+      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
+      int shift = (int)(((float)SHIFT_)/1023.0);
+      scalenotes = s;
+      qnotes = s;
+      shift = 0;
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
     case 2:{
       float aWeird[] = {200, 400, 700, 900, 1200};
       int s = 5;
-      Scale scaleWeird(aWeird, s);}
+      Scale scaleWeird(aWeird, s);      
+      int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
+      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
+      int shift = (int)(((float)SHIFT_)/1023.0);
+      scalenotes = s;
+      qnotes = s;
+      shift = 0;
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
     case 3:{
       float aWeird[] = {200, 300, 500, 700, 800, 1000, 1200};
       int s = 7;
-      Scale scaleWeird(aWeird, s);}
+      Scale scaleWeird(aWeird, s);      
+      int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
+      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
+      int shift = (int)(((float)SHIFT_)/1023.0);
+      scalenotes = s;
+      qnotes = s;
+      shift = 0;
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
     case 4:{
       float aWeird[] = {200, 400, 500, 700, 900, 1100, 1200};
       int s = 7;
-      Scale scaleWeird(aWeird, s);}
+      Scale scaleWeird(aWeird, s);      
+      int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
+      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
+      int shift = (int)(((float)SHIFT_)/1023.0);
+      scalenotes = s;
+      qnotes = s;
+      shift = 0;
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
     case 5:{
+      //Serial.println("in case");
       float aWeird[] = {200, 400, 600, 700, 900, 1100, 1200};
       int s = 7;
-      Scale scaleWeird(aWeird, s);}
+      Scale scaleWeird(aWeird, s);
+      
+      int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
+      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
+      int shift = (int)(((float)SHIFT_)/1023.0);
+      scalenotes = s;
+      qnotes = s;
+      shift = 0;
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
 
     default:{
-      Scale scaleWeird();}
+      int s = 0;}
       break;
   }
-  
-  
-  
-  int scalenotes;
-  int qnotes;
-  int shift;
-  scalenotes = (int)((((float)CHROM_)/1023.0)*s);
-  qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
-  shift = (int)(((float)SHIFT_)/1023.0);
-  
-  //Serial.println(pos/4);
-  WeirdQuantizer quantizahh = WeirdQuantizer(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);
 
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
   int val_127 = (int)((val/0.2235)/256);
 
-  /*idx_ch0_tf1 = 0;
+  idx_ch0_tf1 = 0;
   idx_ch1_tf1 = 0;
   idx_ch2_tf1 = 0;
   idx_ch3_tf1 = 0;
   idx_ch0_tf2 = 0;
   idx_ch1_tf2 = 0;
   idx_ch2_tf2 = 0;
-  idx_ch3_tf2 = 0;*/
+  idx_ch3_tf2 = 0;
   
   //wavetable mapping and lookup
   int idx10 = ((127*idx_ch0_tf1) + val_127) % 16384;
@@ -322,19 +345,24 @@ void readAndOutput() {
   
   float inArr[] = {val0, val1, val2, val3};
   float* arrOut = quantizahh.quantize(inArr);
-  
+  //float arrOut[] = {1, 2, 3, 4};
+  //Serial.flush();
   for (int i = 0; i < 4; i++) {
 	  //Serial.print(arrOut[i]);
 	  //Serial.print(", ");
   }
-
+  //Serial.println("hello");
   dac1.setOutput(arrOut[0]/2);
   dac2.setOutput(arrOut[1]/2);
   dac3.setOutput(arrOut[2]/2);
   dac4.setOutput(arrOut[3]/2);
-  
-  delete[] arrOut;
-  delete[] inArr;
+
+  //delete[] arrOut;
+  //delete[] inArr;
+}
+
+void scaleSelect() {
+  sss = pos/4;
 }
 
 int ledState = LOW;
@@ -348,7 +376,7 @@ void loop()
   } else {
     ledState = LOW;
   }
-
+  Serial.println(sss);
   digitalWrite(ledPin, ledState);
   delay(300);
 }
