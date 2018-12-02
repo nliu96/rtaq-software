@@ -45,7 +45,7 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  timer.begin(readAndOutput, 20000);
+  timer.begin(readAndOutput, 200000);
   //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   //attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
@@ -83,23 +83,37 @@ long sss = 5;
 							6300, 6500, 6700, 7000, 7200 };*/
 int ery = 0;
 void readAndOutput() {
-  Serial.println(ery++);
-  ADC_ = 1023 - analogRead(A9);
-  AMP_ = analogRead(A8);
-  DEST_ = analogRead(A7);
+  //Serial.println(ery++);
+  //ADC_ = 1023 - analogRead(A9);
+  //AMP_ = analogRead(A8);
+  //DEST_ = analogRead(A7);
   MU1_ = 1023 - analogRead(A6);
   TF1_ = 1023 - analogRead(A3);
   MU2_ = 1023 - analogRead(A2);
   TF2_ = 1023 - analogRead(A1);
   SPREAD_ = analogRead(A0);
-  SHIFT_ = analogRead(A22);
-  OFFSET_ = 1023 - analogRead(A21);
+  SHIFT_ = 1023 - analogRead(A22);
+  //OFFSET_ = 1023 - analogRead(A21);
   DP_ = analogRead(A20);
   MIX_ = 1023 - analogRead(A19);
   DENSITY_ = 1023 - analogRead(A18);
-  JAZZ_ = analogRead(A17);
+  //JAZZ_ = analogRead(A17);
   CHROM_ = analogRead(A16);
-  ORDER_ = analogRead(A15); 
+  //ORDER_ = analogRead(A15); 
+
+  //Serial.println(MU1_);
+  //Serial.println(TF1_);
+  //Serial.println(MU2_);
+  //Serial.println(TF2_);
+  //Serial.println(SPREAD_);
+  //Serial.println(SHIFT_);
+  //Serial.println(OFFSET_);
+  //Serial.println(DP_);
+  //Serial.println(MIX_);
+  //Serial.println(DENSITY_);
+  //Serial.println(JAZZ_);
+  //Serial.println(CHROM_);
+  //Serial.println(ORDER_);
 
   //wavetable parameter definition
   int idxtf1 = (int)((((float)TF1_)/1023.0)*127);
@@ -295,7 +309,7 @@ void readAndOutput() {
 
   //chebyshev polynomials
   
-  int order = (int)((((float)ORDER_)/1023.0)*6);
+  int order = (int)((((float)SPREAD_)/1023.0)*6);
   order = 1;
   
   float nval0 = val0/8096.0;
@@ -345,7 +359,6 @@ void readAndOutput() {
     val2 = 8096.0*fabs(32*nval2*nval2*nval2*nval2*nval2*nval2 - 48*nval2*nval2*nval2*nval2 + 18*nval2*nval2 - 1);
     val3 = 8096.0*fabs(32*nval3*nval3*nval3*nval3*nval3*nval3 - 48*nval3*nval3*nval3*nval3 + 18*nval3*nval3 - 1);
   }
-
 
 
   //quantizahh.set(&scaleTT, /*mainScaleNotes = */4, /*quantScaleNotes = */2, /*shift = */0);
