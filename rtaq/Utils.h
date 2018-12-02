@@ -12,7 +12,8 @@ public:
 		
 		// Just return the original scale, # notes is wrong
 		if (indexFactor <= 1.0) {
-			return scale;
+			indexFactor = 0.0;
+			numNotes = originalScaleSize;
 		}
 		
 		float* tempCentsScale = new float[numNotes];

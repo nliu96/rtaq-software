@@ -39,9 +39,15 @@
     <ClInclude Include="WeirdQuantizer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WaveTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Adafruit_ADS1015.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WaveTable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

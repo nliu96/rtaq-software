@@ -45,12 +45,15 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  //timer.begin(readAndOutput, 200000);
-  attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
-  attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
+  timer.begin(readAndOutput, 200000);
+  //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
+  //attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
 
-WeirdQuantizer quantizahh = WeirdQuantizer();
+float aTT[] = { 0.0, 300, 500, 700, 1000, 1200 };
+Scale scaleTT(aTT, 6);
+//WeirdQuantizer quantizahh = WeirdQuantizer();
+WeirdQuantizer quantizahh = WeirdQuantizer(&scaleTT, 4, 2);
 
 float val;
 int ADC_;
@@ -80,7 +83,6 @@ long sss = 5;
 							6300, 6500, 6700, 7000, 7200 };*/
 
 void readAndOutput() {
-  //Serial.println("in ISR");
   
   ADC_ = 1023 - analogRead(A9);
   AMP_ = analogRead(A8);
@@ -123,22 +125,25 @@ void readAndOutput() {
   int idx_ch2_tf2 = (idxtf2 + delta22) % 127;
   int idx_ch3_tf2 = (idxtf2 + delta23) % 127;
 
+ 
   //float fake[] = {1200};
   //Scale scaleWeird(fake, 1);
   //quantizahh.set(&scaleWeird, 1, 1, 0);
   //scale lookup
   int n = 6;
+  // TODO: change utils. instead of returning pointer to scale when index factor is bad, return a copy of it
   switch (sss % n){
-    case 0:{
-      float aWeird[] = {1200};
-      int s = 1;
-      Scale scaleWeird(aWeird, s);      
-      int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
-      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
-      int shift = (int)(((float)SHIFT_)/1023.0);
-      scalenotes = s;
-      qnotes = s;
-      shift = 0;
+  //switch(0) {
+  case 0: {
+	  float aWeird[] = { 1200 };
+	  int s = 1;
+	  Scale scaleWeird(aWeird, s);
+	  int scalenotes = (int)((((float)CHROM_) / 1023.0)*s);
+	  int qnotes = (int)((((float)DENSITY_) / 1023.0)*scalenotes);
+	  int shift = (int)(((float)SHIFT_) / 1023.0);
+	  scalenotes = s;
+	  qnotes = s;
+	  shift = 0;
       quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
@@ -342,15 +347,17 @@ void readAndOutput() {
   }
 
 
-  
+
+  //quantizahh.set(&scaleTT, /*mainScaleNotes = */4, /*quantScaleNotes = */2, /*shift = */0);
   float inArr[] = {val0, val1, val2, val3};
   float* arrOut = quantizahh.quantize(inArr);
   //float arrOut[] = {1, 2, 3, 4};
   //Serial.flush();
   for (int i = 0; i < 4; i++) {
-	  //Serial.print(arrOut[i]);
-	  //Serial.print(", ");
+	  Serial.print(arrOut[i]);
+	  Serial.print(", ");
   }
+  Serial.println("..");
   //Serial.println("hello");
   dac1.setOutput(arrOut[0]/2);
   dac2.setOutput(arrOut[1]/2);
@@ -376,7 +383,8 @@ void loop()
   } else {
     ledState = LOW;
   }
-  Serial.println(sss);
+  //Serial.println(sss);
+  //Serial.println(newpos/4);
   digitalWrite(ledPin, ledState);
   delay(300);
 }
