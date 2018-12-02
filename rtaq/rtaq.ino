@@ -37,7 +37,7 @@ void setup()
   while( !Serial );
   Serial.flush();
   Serial.println("initialized");
-  SPI.setSCK(27);
+  //SPI.setSCK(27);
   SPI.begin();
   ads1115.begin();
   ads1115.setGain(GAIN_TWOTHIRDS);
@@ -45,7 +45,7 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  timer.begin(readAndOutput, 200000);
+  timer.begin(readAndOutput, 20000);
   //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   //attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
@@ -81,9 +81,9 @@ long sss = 5;
 							3900, 4100, 4300, 4600, 4800,
 							5100, 5300, 5500, 5800, 6000,
 							6300, 6500, 6700, 7000, 7200 };*/
-
+int ery = 0;
 void readAndOutput() {
-  
+  Serial.println(ery++);
   ADC_ = 1023 - analogRead(A9);
   AMP_ = analogRead(A8);
   DEST_ = analogRead(A7);
@@ -364,8 +364,7 @@ void readAndOutput() {
   dac3.setOutput(arrOut[2]/2);
   dac4.setOutput(arrOut[3]/2);
 
-  //delete[] arrOut;
-  //delete[] inArr;
+  delete[] arrOut;
 }
 
 void scaleSelect() {
