@@ -91,4 +91,27 @@ TEST(Quant, QuantizeScale2) {
 		EXPECT_EQ(quantizer.quantize(expected[i]), expected[i]);
 	}
 }
-#pragma optimize("", on)
+
+TEST(Quant, Copy) {
+	float a[] = { 0.0, 300, 500, 700, 1000, 1200 };
+	int aSize = sizeof(a) / sizeof(a[0]);
+	Scale scale = Scale(a, aSize);
+	Quantizer quantizer = Quantizer(&scale);
+	Quantizer quantizer2 = Quantizer(&scale);
+	quantizer = quantizer2;
+
+	float expected[] = { 0.0, 300, 500, 700, 1000, 1200,
+							1500, 1700, 1900, 2200, 2400,
+							2700, 2900, 3100, 3400, 3600,
+							3900, 4100, 4300, 4600, 4800,
+							5100, 5300, 5500, 5800, 6000,
+							6300, 6500, 6700, 7000, 7200 };
+	int expectedSize = sizeof(expected) / sizeof(expected[0]);
+	ASSERT_EQ(scale.getScaleSize(), 5);
+	ASSERT_EQ(quantizer.getTotalNotes(), expectedSize);
+
+	for (int i = 0; i < expectedSize; i++) {
+		EXPECT_EQ(quantizer.quantize(expected[i]), expected[i]);
+		EXPECT_EQ(quantizer2.quantize(expected[i]), expected[i]);
+	}
+}

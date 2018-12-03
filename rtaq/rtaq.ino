@@ -7,6 +7,7 @@
 #include "WeirdQuantizer.h"
 #include <Encoder.h>
 #include "WaveTable.h"
+#include "Utils.h"
 //#include <Wire.h>
 //#include <string>
 
@@ -45,7 +46,10 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  timer.begin(readAndOutput, 200000);
+  Scale* sccC = Utils::getKnobScales();
+  Serial.println(sccC[0].getScaleSize());
+  Serial.println(sccC[1].getScaleSize());
+  //timer.begin(readAndOutput, 200000);
   //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
