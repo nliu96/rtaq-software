@@ -8,7 +8,7 @@ class Quantizer {
 public:
 	Quantizer() { };
 	~Quantizer() {
-		//delete[] extendedScale;
+		delete[] extendedScale;
 	};
 	Quantizer(Scale* aScale) {
 		this->scale = aScale;
@@ -36,11 +36,25 @@ public:
 	float* getExtendedScale() {
 		return this->extendedScale;
 	}
+	void setScale(Scale* sc) {
+		delete[] this->extendedScale;
+		delete this->scale;
+		this->scale = sc;
+		this->scaleSize = sc->getScaleSize();
+		setExtendedScaleClass();
+	}
 	void operator=(const Quantizer& q) {
-		this->scale = q.scale;
-		this->extendedScale = q.extendedScale;
+		//this->scale = q.scale;
+		//this->extendedScale = q.extendedScale;
+		//this->scaleSize = q.scaleSize;
+		//this->totalNotes = q.totalNotes;
+		this->scale = new Scale(q.scale->getCentsScale(), q.scale->getScaleSize());
 		this->scaleSize = q.scaleSize;
 		this->totalNotes = q.totalNotes;
+		this->extendedScale = new float[this->totalNotes];
+		for (int i = 0; i < this->totalNotes; i++) {
+			this->extendedScale[i] = q.extendedScale[i];
+		}
 	}
 private:
 	const int highDacValue = 8192;

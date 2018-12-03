@@ -45,9 +45,9 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  timer.begin(readAndOutput, 20000);
+  timer.begin(readAndOutput, 200000);
   //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
-  //attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
+  attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
 
 float aTT[] = { 200, 400, 500, 700,
@@ -74,7 +74,7 @@ int JAZZ_;
 int CHROM_;
 int ORDER_;
 long pos = -999;
-long sss = 5;
+long sss = 1;
 
 /*float expected[] = { 0.0, 300, 500, 700, 1000, 1200,
 							1500, 1700, 1900, 2200, 2400,
@@ -92,14 +92,14 @@ void readAndOutput() {
   TF1_ = 1023 - analogRead(A3);
   MU2_ = 1023 - analogRead(A2);
   TF2_ = 1023 - analogRead(A1);
-  SPREAD_ = analogRead(A0);
+  SPREAD_ = 1023 - analogRead(A0);
   SHIFT_ = 1023 - analogRead(A22);
   //OFFSET_ = 1023 - analogRead(A21);
-  DP_ = analogRead(A20);
+  DP_ = 1023 - analogRead(A20);
   MIX_ = 1023 - analogRead(A19);
   DENSITY_ = 1023 - analogRead(A18);
   //JAZZ_ = analogRead(A17);
-  CHROM_ = analogRead(A16);
+  CHROM_ = 1023 - analogRead(A16);
   //ORDER_ = analogRead(A15); 
 
   //Serial.println(MU1_);
@@ -147,18 +147,14 @@ void readAndOutput() {
   //scale lookup
   int n = 6;
   // TODO: change utils. instead of returning pointer to scale when index factor is bad, return a copy of it
-  //switch (sss % n){
-  switch(1) {
+ switch (sss % n){
   case 0: {
 	  float aWeird[] = { 1200 };
-	  int s = 1;
-	  Scale scaleWeird(aWeird, s);
-	  int scalenotes = (int)((((float)CHROM_) / 1023.0)*s);
-	  int qnotes = (int)((((float)DENSITY_) / 1023.0)*scalenotes);
-	  int shift = (int)(((float)SHIFT_) / 1023.0);
-	  scalenotes = s;
-	  qnotes = s;
-	  shift = 0;
+  	  int s = 1;
+  	  Scale scaleWeird(aWeird, s);
+  	  int scalenotes = (int)((((float)CHROM_) / 1023.0)*s);
+  	  int qnotes = (int)((((float)DENSITY_) / 1023.0)*scalenotes);
+  	  int shift = (int)(((float)SHIFT_) / 1023.0);
       quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
@@ -167,12 +163,10 @@ void readAndOutput() {
       int s = 5;
       Scale scaleWeird(aWeird, s);      
       int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
-      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
+      int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes) + 1;
+      Serial.println(qnotes);
       int shift = (int)(((float)SHIFT_)/1023.0);
-      scalenotes = s;
-      qnotes = s;
-      shift = 0;
-      quantizahh.set(&scaleWeird, /*mainScaleNotes = */5, /*quantScaleNotes = */1, /*shift = */shift);}
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
     case 2:{
@@ -182,9 +176,6 @@ void readAndOutput() {
       int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
       int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
       int shift = (int)(((float)SHIFT_)/1023.0);
-      scalenotes = s;
-      qnotes = s;
-      shift = 0;
       quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
@@ -195,9 +186,6 @@ void readAndOutput() {
       int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
       int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
       int shift = (int)(((float)SHIFT_)/1023.0);
-      scalenotes = s;
-      qnotes = s;
-      shift = 0;
       quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
@@ -208,9 +196,6 @@ void readAndOutput() {
       int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
       int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
       int shift = (int)(((float)SHIFT_)/1023.0);
-      scalenotes = s;
-      qnotes = s;
-      shift = 0;
       quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
       
@@ -223,9 +208,6 @@ void readAndOutput() {
       int scalenotes = (int)((((float)CHROM_)/1023.0)*s);
       int qnotes = (int)((((float)DENSITY_)/1023.0)*scalenotes);
       int shift = (int)(((float)SHIFT_)/1023.0);
-      scalenotes = s;
-      qnotes = s;
-      shift = 0;
       quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
       break;
 
@@ -237,14 +219,15 @@ void readAndOutput() {
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
   int val_127 = (int)((val/0.2235)/256);
 
-  idx_ch0_tf1 = 0;
+
+  /*idx_ch0_tf1 = 0;
   idx_ch1_tf1 = 0;
   idx_ch2_tf1 = 0;
   idx_ch3_tf1 = 0;
   idx_ch0_tf2 = 0;
   idx_ch1_tf2 = 0;
   idx_ch2_tf2 = 0;
-  idx_ch3_tf2 = 0;
+  idx_ch3_tf2 = 0;*/
   
   //wavetable mapping and lookup
   int idx10 = ((127*idx_ch0_tf1) + val_127) % 16384;
@@ -363,8 +346,9 @@ void readAndOutput() {
 
 
   //quantizahh.set(&scaleTT, /*mainScaleNotes = */7, /*quantScaleNotes = */3, /*shift = */0);
-  //float inArr[] = {val0, val1, val2, val3};
-  float inArr[] = { 3000, 3000, 3000, 3000 };
+  Serial.println(val0);
+  float inArr[] = {val0, val1, val2, val3};
+  //float inArr[] = { 3000, 3000, 3000, 3000 };
   float* arrOut = quantizahh.quantize(inArr);
   //float arrOut[] = {1, 2, 3, 4};
   //Serial.flush();

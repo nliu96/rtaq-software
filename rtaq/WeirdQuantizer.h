@@ -48,7 +48,7 @@ public:
 
 		return outputs;
 	}
-	void set(Scale* aScale, int mainScaleNotes, int quantScaleNotes, int shift = 0) {
+	/*void set(Scale* aScale, int mainScaleNotes, int quantScaleNotes, int shift = 0) {
 		delete this->scale;
 		this->scale = Utils::generateSubScale(aScale, mainScaleNotes);
 		//this->quantizers = new Quantizer[numOutputs];
@@ -58,6 +58,16 @@ public:
 			quantizers[i] = Quantizer(subScale);
       //Serial.println("didn't crash here I guess xxx");
 			delete subScale;
+		}
+	}*/
+	void set(Scale* aScale, int mainScaleNotes, int quantScaleNotes, int shift = 0) {
+		delete this->scale;
+		this->scale = Utils::generateSubScale(aScale, mainScaleNotes);
+		for (int i = 0; i < numOutputs; i++) {
+			Scale* subScale = Utils::generateSubScale(this->scale, quantScaleNotes, i + shift);
+			//quantizers[i] = Quantizer(subScale);
+			quantizers[i].setScale(subScale);
+			//delete subScale;
 		}
 	}
 private:
