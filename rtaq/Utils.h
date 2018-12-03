@@ -11,8 +11,8 @@ public:
 		float indexFactor = (float) originalScaleSize / numNotes;
 		
 		// Just return the original scale, # notes is wrong
-		if (indexFactor <= 1.0) {
-			indexFactor = 0.0;
+		if (indexFactor < 1.0) {
+			indexFactor = 1.0;
 			numNotes = originalScaleSize;
 		}
 		
@@ -22,8 +22,8 @@ public:
 		// Place equal distance indices in new array
 		for (int i = 0; i < numNotes; i++) {
 			int scaledIndex = (int)(i*indexFactor);
-			//float thaThing = 
-			//	originalCentsScale[shiftIndex(scaledIndex, shift, originalScaleSize)];
+			float thaThing = 
+				originalCentsScale[shiftIndex(scaledIndex, shift, originalScaleSize)];
 			tempCentsScale[i] = originalCentsScale[
 					shiftIndex(scaledIndex, shift, originalScaleSize)];
 		}

@@ -45,15 +45,16 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  timer.begin(readAndOutput, 200000);
+  timer.begin(readAndOutput, 20000);
   //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   //attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
 
-float aTT[] = { 0.0, 300, 500, 700, 1000, 1200 };
-Scale scaleTT(aTT, 6);
+float aTT[] = { 200, 400, 500, 700,
+		900, 1100, 1200 };
+Scale scaleTT(aTT, 7);
 //WeirdQuantizer quantizahh = WeirdQuantizer();
-WeirdQuantizer quantizahh = WeirdQuantizer(&scaleTT, 4, 2);
+WeirdQuantizer quantizahh = WeirdQuantizer(&scaleTT, 7, 3);
 
 float val;
 int ADC_;
@@ -83,7 +84,7 @@ long sss = 5;
 							6300, 6500, 6700, 7000, 7200 };*/
 int ery = 0;
 void readAndOutput() {
-  //Serial.println(ery++);
+  Serial.println(ery++);
   //ADC_ = 1023 - analogRead(A9);
   //AMP_ = analogRead(A8);
   //DEST_ = analogRead(A7);
@@ -146,8 +147,8 @@ void readAndOutput() {
   //scale lookup
   int n = 6;
   // TODO: change utils. instead of returning pointer to scale when index factor is bad, return a copy of it
-  switch (sss % n){
-  //switch(0) {
+  //switch (sss % n){
+  switch(1) {
   case 0: {
 	  float aWeird[] = { 1200 };
 	  int s = 1;
@@ -171,7 +172,7 @@ void readAndOutput() {
       scalenotes = s;
       qnotes = s;
       shift = 0;
-      quantizahh.set(&scaleWeird, /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);}
+      quantizahh.set(&scaleWeird, /*mainScaleNotes = */5, /*quantScaleNotes = */1, /*shift = */shift);}
       break;
       
     case 2:{
@@ -361,8 +362,9 @@ void readAndOutput() {
   }
 
 
-  //quantizahh.set(&scaleTT, /*mainScaleNotes = */4, /*quantScaleNotes = */2, /*shift = */0);
-  float inArr[] = {val0, val1, val2, val3};
+  //quantizahh.set(&scaleTT, /*mainScaleNotes = */7, /*quantScaleNotes = */3, /*shift = */0);
+  //float inArr[] = {val0, val1, val2, val3};
+  float inArr[] = { 3000, 3000, 3000, 3000 };
   float* arrOut = quantizahh.quantize(inArr);
   //float arrOut[] = {1, 2, 3, 4};
   //Serial.flush();

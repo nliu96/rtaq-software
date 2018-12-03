@@ -10,6 +10,9 @@ public:
 	~WeirdQuantizer() {
 		delete scale;
 		//for (int i = 0; i < this->numOutputs; i++) {
+		//	quantizers[i].~Quantizer();
+		//}
+		//for (int i = 0; i < this->numOutputs; i++) {
 		//	delete[] quantizers[i].getExtendedScale();
 		//}
 		//delete[] quantizers[0].getExtendedScale();

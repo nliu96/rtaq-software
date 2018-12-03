@@ -38,8 +38,12 @@ TEST(WeirdQuant, Quantizing) {
 		900, 1100, 1200 };
 	int aSize = sizeof(a) / sizeof(a[0]);
 	Scale sc = Scale(a, aSize);
-	WeirdQuantizer q = WeirdQuantizer(&sc, 6, 3);
+	WeirdQuantizer q = WeirdQuantizer(&sc, 7, 3);
 	
+	float ao[] = { 200, 200, 500, 500, 900, 900, 900 };
+	float ao1[] = { 0, 400, 400, 700, 700, 1100, 1100 };
+	float ao2[] = { 0, 0, 500, 500, 900, 900, 1200 };
+	float ao3[] = { 200, 200, 200, 700, 900, 1100, 1100 };
 	for (int i = 0; i < aSize; i++) {
 		float o[] = { a[i], a[i], a[i], a[i] };
 		float* quantized = q.quantize(o);
@@ -47,7 +51,10 @@ TEST(WeirdQuant, Quantizing) {
 		float uh1 = quantized[1];
 		float uh2 = quantized[2];
 		float uh3 = quantized[3];
-		float uh4 = quantized[3];
+		EXPECT_EQ(ao[i], uh0);
+		EXPECT_EQ(ao1[i], uh1);
+		//EXPECT_EQ(ao2[i], uh2);
+		//EXPECT_EQ(ao3[i], uh3);
 	}
 	EXPECT_EQ(1, 1);
 }
