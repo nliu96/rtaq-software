@@ -1,3 +1,5 @@
+#include <U8g2lib.h>
+#include <U8x8lib.h>
 #include "Adafruit_ADS1015.h"
 #include <SPI.h>
 //#include <SdFat.h>
@@ -24,6 +26,13 @@ DAC_MPS dac4(1, PIN_CSB);
 const int ledPin = LED_BUILTIN;
 IntervalTimer timer;
 Encoder knob(32, 31);
+U8G2_SH1106_128X64_NONAME_F_4W_HW_SPI u8g2(U8G2_R2, /* cs=*/ 24, /* dc=*/ 25, /* reset=*/ 26);
+void u8g_prepare(void) {
+  u8g2.setFont(u8g_font_6x10);
+  u8g2.setFontRefHeightExtendedText();
+  //u8g2.setDefaultForegroundColor();
+  u8g2.setFontPosTop();
+}
 
 //void readAndOutput();
 
@@ -46,11 +55,14 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  Scale* sccC = Utils::getKnobScales();
-  Serial.println(sccC[0].getScaleSize());
-  Serial.println(sccC[1].getScaleSize());
+  u8g2.begin();
+  u8g_prepare();
+  //Serial.println(sccC[0].getScaleSize());
+  //Serial.println(sccC[1].getScaleSize());
+  //Serial.println(sccC[2].getScaleSize());
+  //Serial.println(sccC[3].getScaleSize());
   //timer.begin(readAndOutput, 200000);
-  //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
+  attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
 
@@ -59,6 +71,7 @@ float aTT[] = { 200, 400, 500, 700,
 Scale scaleTT(aTT, 7);
 //WeirdQuantizer quantizahh = WeirdQuantizer();
 WeirdQuantizer quantizahh = WeirdQuantizer(&scaleTT, 7, 3);
+Scale* sccC = Utils::getKnobScales();
 
 float val;
 int ADC_;
@@ -79,6 +92,14 @@ int CHROM_;
 int ORDER_;
 long pos = -999;
 long sss = 1;
+long curScale;
+long nextScale;
+int nScales = 24;
+String scaleNames[] = {"octave", "Major pentatonic", "minor pentatonic", "ionian", "dorian", "phrygian", "lydian", "myxolydian", "aeolian", "locrian", "pyth Maj pentatonic",
+                  "pyth minor pentatonic", "indian a", "indian magrama", "indian raga dk", "indian raja", "sorog madenda", "chinese lusheng", "chinese dizi", "chinese sheng",
+                  "chinese yangqin", "al farabi g2", "arabic zanjaran", "arabic rast on c"};
+int op = 0;
+String opNames[] = {"arith avg", "geo avg", "min", "max"};
 
 /*float expected[] = { 0.0, 300, 500, 700, 1000, 1200,
 							1500, 1700, 1900, 2200, 2400,
@@ -149,7 +170,7 @@ void readAndOutput() {
   //Scale scaleWeird(fake, 1);
   //quantizahh.set(&scaleWeird, 1, 1, 0);
   //scale lookup
-  int n = 6;
+  int n = nScales;
   // TODO: change utils. instead of returning pointer to scale when index factor is bad, return a copy of it
  switch (sss % n){
   case 0: {
@@ -222,6 +243,7 @@ void readAndOutput() {
 
   val = 0.2235 * ((float)ads1115.readADC_SingleEnded(0));
   int val_127 = (int)((val/0.2235)/256);
+  //Serial.println(val);
 
 
   /*idx_ch0_tf1 = 0;
@@ -263,8 +285,7 @@ void readAndOutput() {
   float val2;
   float val3;
 
-  int op = (int)((((float)DP_)/1023.0)*3);
-  op = 0;
+  op = (int)((((float)DP_)/1000.0)*3);
   if (op == 0){
     //arithmetic avg
     val0 = (k*val20 + (1-k)*val10);
@@ -298,7 +319,7 @@ void readAndOutput() {
   //chebyshev polynomials
   
   int order = (int)((((float)SPREAD_)/1023.0)*6);
-  order = 1;
+  //order = 1;
   
   float nval0 = val0/8096.0;
   float nval1 = val1/8096.0;
@@ -353,6 +374,12 @@ void readAndOutput() {
   Serial.println(val0);
   float inArr[] = {val0, val1, val2, val3};
   //float inArr[] = { 3000, 3000, 3000, 3000 };
+  
+  int scalenotes = (int)((((float)CHROM_) / 1023.0)*sccC[sss % n].getScaleSize()) + 1;
+  int qnotes = (int)((((float)DENSITY_) / 1023.0)*scalenotes) + 1;
+  int shift = (int)(((float)SHIFT_) / 1023.0);
+  Serial.println(sss % n);
+  quantizahh.set(&sccC[sss % n], /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);
   float* arrOut = quantizahh.quantize(inArr);
   //float arrOut[] = {1, 2, 3, 4};
   //Serial.flush();
@@ -380,13 +407,27 @@ void loop()
   long newpos;
   newpos = knob.read();
   pos = newpos;
-  if (ledState == LOW) {
-    ledState = HIGH;
-  } else {
-    ledState = LOW;
-  }
-  //Serial.println(sss);
-  //Serial.println(newpos/4);
-  digitalWrite(ledPin, ledState);
-  delay(300);
+  curScale = sss % nScales;
+  String curScaleName = scaleNames[curScale];
+  long temp = pos/4;
+  nextScale = temp % nScales;
+  String nextScaleName = scaleNames[nextScale];
+  String curOpName = opNames[op];
+//  if (ledState == LOW) {
+//    ledState = HIGH;
+//  } else {
+//    ledState = LOW;
+//  }
+
+  // UI
+  u8g2.clearBuffer();
+  u8g2.firstPage();  
+  do {
+    u8g2.drawStr( 0, 0, curScaleName.c_str());
+    u8g2.drawStr( 0, 20, nextScaleName.c_str()); 
+    u8g2.drawStr( 0, 40, curOpName.c_str()); 
+  } while( u8g2.nextPage() );
+  
+//  digitalWrite(ledPin, ledState);
+//  delay(300);
 }
