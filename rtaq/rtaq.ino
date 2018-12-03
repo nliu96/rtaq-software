@@ -46,10 +46,7 @@ void setup()
   pinMode(30, INPUT_PULLUP);
   pinMode(29, INPUT_PULLUP);
 
-  Scale* sccC = Utils::getKnobScales();
-  Serial.println(sccC[0].getScaleSize());
-  Serial.println(sccC[1].getScaleSize());
-  //timer.begin(readAndOutput, 200000);
+  timer.begin(readAndOutput, 200000);
   //attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
 }
@@ -59,6 +56,7 @@ float aTT[] = { 200, 400, 500, 700,
 Scale scaleTT(aTT, 7);
 //WeirdQuantizer quantizahh = WeirdQuantizer();
 WeirdQuantizer quantizahh = WeirdQuantizer(&scaleTT, 7, 3);
+Scale* sccC = Utils::getKnobScales();
 
 float val;
 int ADC_;
@@ -353,6 +351,7 @@ void readAndOutput() {
   Serial.println(val0);
   float inArr[] = {val0, val1, val2, val3};
   //float inArr[] = { 3000, 3000, 3000, 3000 };
+  quantizahh.set(&sccC[sss % n], /*mainScaleNotes = */5, /*quantScaleNotes = */3, /*shift = */0);
   float* arrOut = quantizahh.quantize(inArr);
   //float arrOut[] = {1, 2, 3, 4};
   //Serial.flush();
