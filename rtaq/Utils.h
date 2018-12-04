@@ -134,6 +134,33 @@ public:
     scales[23] = scaleWeird23;
 		return scales;
 	}
+	static Scale* getKnobProg() {
+		int s = 7;
+		float aWeird[] = { 200, 400, 500, 700, 900, 1100, 1200 };	// I
+		Scale scaleWeird(aWeird, s, false);
+		float aWeird1[] = { 700, 900, 1100, 1200, 200, 400, 600 };	// V
+		Scale scaleWeird1(aWeird1, s, false);
+		float aWeird2[] = { 900, 1100, 1200, 200, 400, 600, 800 };	// vi
+		Scale scaleWeird2(aWeird2, s, false);
+		float aWeird3[] = { 500, 700, 900, 1000, 1200, 200, 400 };	// vi
+		Scale scaleWeird3(aWeird3, s, false);
+		float aWeird4[] = { 200, 400, 500, 700, 900, 1000, 100 };	// ii
+		Scale scaleWeird4(aWeird4, s, false);
+		float aWeird5[] = { 700, 900, 1100, 1200, 200, 400, 600 };	// V
+		Scale scaleWeird5(aWeird5, s, false);
+		float aWeird6[] = { 200, 400, 500, 700, 900, 1100, 1200 };	// I
+		Scale scaleWeird6(aWeird6, s, false);
+
+		Scale* scales = new Scale[7];
+		scales[0] = scaleWeird;
+		scales[1] = scaleWeird1;
+		scales[2] = scaleWeird2;
+		scales[3] = scaleWeird3;
+		scales[4] = scaleWeird4;
+		scales[5] = scaleWeird5;
+		scales[6] = scaleWeird6;
+		return scales;
+	}
 private:
 	static int shiftIndex(int index, int shift, int arraySize) {
 		return (index + shift) % arraySize;

@@ -16,6 +16,9 @@
 const int ANALOG = 0;
 Adafruit_ADS1115 ads1115;
 Waave wavetable = Waave();
+bool tryProgression = true;
+Scale* prog;
+int progNum = 0;
 
 const int PIN_CSA = 9;
 const int PIN_CSB = 10;
@@ -64,6 +67,11 @@ void setup()
   //timer.begin(readAndOutput, 200000);
   attachInterrupt(digitalPinToInterrupt(29), readAndOutput, FALLING);
   attachInterrupt(digitalPinToInterrupt(30), scaleSelect, FALLING);
+
+  if (tryProgression) {
+	  prog = Utils::getKnobProg();
+	  timer.begin(progression, 1000000);
+  }
 }
 
 float aTT[] = { 200, 400, 500, 700,
@@ -171,7 +179,6 @@ void readAndOutput() {
   //quantizahh.set(&scaleWeird, 1, 1, 0);
   //scale lookup
   int n = nScales;
-  // TODO: change utils. instead of returning pointer to scale when index factor is bad, return a copy of it
  switch (999){
   case 0: {
 	  float aWeird[] = { 1200 };
@@ -387,7 +394,12 @@ void readAndOutput() {
   Serial.println("");
   Serial.println("");
   Serial.println("");
-  quantizahh.set(&sccC[sss % n], /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);
+  
+  if (tryProgression) {
+	  quantizahh.set(&prog[progNum % 7], /*mainScaleNotes = */7, /*quantScaleNotes = */4, /*shift = */shift);
+  } else {
+	  quantizahh.set(&sccC[sss % n], /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);
+  }
   float* arrOut = quantizahh.quantize(inArr);
   //float arrOut[] = {1, 2, 3, 4};
   //Serial.flush();
@@ -407,6 +419,10 @@ void readAndOutput() {
 
 void scaleSelect() {
   sss = pos/4;
+}
+
+void progression() {
+	progNum++;
 }
 
 int ledState = LOW;
