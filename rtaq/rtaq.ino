@@ -172,7 +172,7 @@ void readAndOutput() {
   //scale lookup
   int n = nScales;
   // TODO: change utils. instead of returning pointer to scale when index factor is bad, return a copy of it
- switch (sss % n){
+ switch (999){
   case 0: {
 	  float aWeird[] = { 1200 };
   	  int s = 1;
@@ -371,14 +371,22 @@ void readAndOutput() {
 
 
   //quantizahh.set(&scaleTT, /*mainScaleNotes = */7, /*quantScaleNotes = */3, /*shift = */0);
-  Serial.println(val0);
+  //Serial.println(val0);
   float inArr[] = {val0, val1, val2, val3};
   //float inArr[] = { 3000, 3000, 3000, 3000 };
   
   int scalenotes = (int)((((float)CHROM_) / 1023.0)*sccC[sss % n].getScaleSize()) + 1;
   int qnotes = (int)((((float)DENSITY_) / 1023.0)*scalenotes) + 1;
-  int shift = (int)(((float)SHIFT_) / 1023.0);
-  Serial.println(sss % n);
+  int shift = (int)((((float)SHIFT_) / 1023.0)*sccC[sss % n].getScaleSize());
+  //Serial.println(sss % n);
+  Serial.print(scalenotes);
+  Serial.print(", ");
+  Serial.print(qnotes);
+  Serial.print(", ");
+  Serial.print(shift);
+  Serial.println("");
+  Serial.println("");
+  Serial.println("");
   quantizahh.set(&sccC[sss % n], /*mainScaleNotes = */scalenotes, /*quantScaleNotes = */qnotes, /*shift = */shift);
   float* arrOut = quantizahh.quantize(inArr);
   //float arrOut[] = {1, 2, 3, 4};
